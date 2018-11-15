@@ -1,28 +1,29 @@
 package com.sethkeadle.project;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.util.Log;
-import android.util.Printer;
-import android.widget.Toast;
 
 import com.jcraft.jsch.Channel;
-import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.PrintStream;
-import java.security.PrivateKey;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 
 
 //singleton class holding thee active ssh connection to the Amazon EC2 instance
-public class Server implements Runnable {
+public class Server extends AsyncTask<String, Void, String> implements Runnable{
     private JSch jsch;
     private Session session;
     private Context context;
+    private PrintWriter toChannel;
     private final String ls = "ls";
+    private  InputStream inStream;
+    private Channel myChannel;
+    private InputStreamReader tout;
 
     private static Server instance = null;
 
@@ -38,97 +39,132 @@ public class Server implements Runnable {
         Log.i("MyApp", "into Server");
         this.context = context;
         jsch = new JSch();
-        java.util.Properties config = new java.util.Properties();
-        config.put("StrictHostKeyChecking", "no");
-        try {
-            session = jsch.getSession("guest","18.225.22.185",22);
-            session.setPassword("password");
-            session.setConfig(config);
-        }
-        catch (Exception e)
-        {
-            Log.e("MyApp",e.getMessage());
-        }
+        //SSHClient ssh = new SSHClient();
+    }
+    public void start() {
+        Thread thread = new Thread(instance);
+        thread.start();
+    }
+    @Override
+    public void run() {
+            try {
+                java.util.Properties config = new java.util.Properties();
+                config.put("StrictHostKeyChecking", "no");
+                session = jsch.getSession("guest","18.225.22.185",22);
+                session.setPassword("password");
+                session.setConfig(config);
 
+                Log.i("MyApp","try To connect");
+                session.connect();
+                myChannel = session.openChannel("shell");
+                myChannel.connect();
+                Log.i("MyApp","Connected");
+
+
+                //send a command for testing
+                sendCommand();
+                //Log.i("MyApp","Command Sent");
+
+                //start reader thread
+                inStream = myChannel.getInputStream();
+
+                readerThread();
+//            Log.i("MyApp","Reader started");
+
+            }
+            catch (Exception e) {
+                Log.e("MyApp", e.getMessage());
+            }
+    }
+    public void sendCommand()
+    {
+        if(session != null && session.isConnected())
+        {
+            try {
+                OutputStream outStream = myChannel.getOutputStream();
+                toChannel = new PrintWriter(new OutputStreamWriter(outStream), true);
+                toChannel.println("pwd");
+                Log.i("MyApp","Command pwd sent");
+            } catch(Exception e){
+                Log.e("MyApp",e.getMessage());
+            }
+        }
+    }
+    void readerThread()
+    {
+        final InputStreamReader tout = new InputStreamReader(inStream);
+        //Thread read2 = new Thread(){
+           // @Override
+            //public void run(){
+                Log.i("MyApp","Reader Thread running");
+                StringBuilder line = new StringBuilder();
+                char toAppend = ' ';
+                try {
+                    while(true){
+                        try {
+                            while (tout.ready()) {
+                                Log.i("MyApp","in while loop");
+                                toAppend = (char) tout.read();
+                                if(toAppend == '\n')
+                                {
+                                    Log.i("MyApp","line: " + line.toString());
+                                    line.setLength(0);
+                                }
+                                else
+                                    line.append(toAppend);
+                                if(tout.ready() == false) {
+                                    Log.i("MyApp","Shit broke");
+                                }
+                            }
+                        } catch (Exception e) {
+                            Log.e("MyApp","************errorrrrrrr reading character**********");
+                        }
+                        //Thread.sleep(1000);
+                    }
+                }catch (Exception ex) {
+                    Log.i("MyApp",ex.getMessage());
+                    try{
+                        tout.close();
+                    }
+                    catch(Exception e)
+                    {
+                        Log.e("MyApp","error at catch");
+                    }
+                }
+           // }
+        //};
+        //read2.start();
     }
 
     @Override
-    public void run() {
+    protected String doInBackground(String... strings) {
         try {
+            java.util.Properties config = new java.util.Properties();
+            config.put("StrictHostKeyChecking", "no");
+            session = jsch.getSession("guest","18.225.22.185",22);
+            session.setPassword("password");
+            session.setConfig(config);
+
             Log.i("MyApp","try To connect");
             session.connect();
+            myChannel = session.openChannel("shell");
+            myChannel.connect();
             Log.i("MyApp","Connected");
-            try {
-                Thread.sleep(1000);
-                exec();
-            }
-            catch (Exception e) {
-                Log.i("MyApp",e.getMessage());
-            }
-        }
-        catch (Exception e) {
-            Log.i("MyApp",e.getMessage());
-        }
-    }
 
-    public void exec() {
-        try {
-            //SSH channel
-            Channel channelssh = (Channel) session.openChannel("exec");
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            channelssh.setOutputStream(baos);
-            channelssh.setInputStream(null);
+            //send a command for testing
+            sendCommand();
+            //Log.i("MyApp","Command Sent");
 
-            BufferedReader bReader = new BufferedReader(new InputStreamReader(channelssh.getInputStream()));
+            //start reader thread
+            inStream = myChannel.getInputStream();
+            readerThread();
+//            Log.i("MyApp","Reader started");
 
-            //Send a command
-            PrintStream out = new PrintStream(channelssh.getOutputStream());
-            out.println("#!/bin/bash/pwd");
-            out.println("exit");
-            out.flush();
-
-            //read string
-            readChannelOutput(channelssh);
-            channelssh.disconnect();
         }
         catch (Exception e) {
             Log.e("MyApp",e.getMessage());
         }
-
+        Log.i("MyApp","Execute Async");
+        return null;
     }
-    private static void readChannelOutput(Channel channel){
-
-        byte[] buffer = new byte[1024];
-
-        try{
-            InputStream in = channel.getInputStream();
-            String line = "";
-            while (true){
-                while (in.available() > 0) {
-                    int i = in.read(buffer, 0, 1024);
-                    if (i < 0) {
-                        break;
-                    }
-                    line = new String(buffer, 0, i);
-                    //System.out.println(line);
-                    Log.i("myApp","line: " + line);
-                }
-
-                if(line.contains("logout")){
-                    break;
-                }
-
-                if (channel.isClosed()){
-                    break;
-                }
-                try {
-                    Thread.sleep(1000);
-                } catch (Exception ee){}
-            }
-        }catch(Exception e){
-            System.out.println("Error while reading channel output: "+ e);
-        }
-
-    }
-
 }

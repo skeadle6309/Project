@@ -30,26 +30,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void seeFood(View view) {
-        //Toast.makeText(this, "See Food", Toast.LENGTH_SHORT).show();
-
-        Thread thread = new Thread(server);
-        try {
-            thread.start();
-        }
-        catch (Exception e)
-        {
-            Toast.makeText(this, "Connection Failed", Toast.LENGTH_SHORT).show();
-        }
-//        try {
-//            server.exec();
-//        }
-//        catch (Exception e) {
-//            Log.i("MyApp", "Execute Failed");
-//        }
+        //Log.i("MyApp","Trying to Exec");
+        server.execute();
+        //server.start();
+        //Log.i("MyApp","Exec");
     }
 
     public void addPhotoCam(View view) {
-        Toast.makeText(this, "camera", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "camera", Toast.LENGTH_SHORT).show();
+        Server.getInsance(this).sendCommand();
+        //Server.getInsance(this).readerThread();
+
     }
 
     public void addPhotoGal(View view) {
