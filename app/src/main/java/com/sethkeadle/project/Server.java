@@ -44,6 +44,12 @@ public class Server extends AsyncTask<String, Void, String> implements Runnable{
     public void start() {
         Thread thread = new Thread(instance);
         thread.start();
+        try {
+            thread.join();
+            Log.i("MyApp","Thread Joined");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
     @Override
     public void run() {
@@ -53,7 +59,7 @@ public class Server extends AsyncTask<String, Void, String> implements Runnable{
                 session = jsch.getSession("guest","18.225.22.185",22);
                 session.setPassword("password");
                 session.setConfig(config);
-
+                session.setTimeout(10000);
                 Log.i("MyApp","try To connect");
                 session.connect();
                 myChannel = session.openChannel("shell");
@@ -92,7 +98,7 @@ public class Server extends AsyncTask<String, Void, String> implements Runnable{
     }
     void readerThread()
     {
-        final InputStreamReader tout = new InputStreamReader(inStream);
+
         //Thread read2 = new Thread(){
            // @Override
             //public void run(){
@@ -100,26 +106,34 @@ public class Server extends AsyncTask<String, Void, String> implements Runnable{
                 StringBuilder line = new StringBuilder();
                 char toAppend = ' ';
                 try {
+                    int i = 0;
                     while(true){
+                        //Log.i("MyApp","first while loop");
+
+                        final InputStreamReader tout = new InputStreamReader(inStream);
                         try {
+
                             while (tout.ready()) {
-                                Log.i("MyApp","in while loop");
+                                //Log.i("MyApp", "second while loop");
                                 toAppend = (char) tout.read();
-                                if(toAppend == '\n')
-                                {
-                                    Log.i("MyApp","line: " + line.toString());
+                                if (toAppend == '\n') {
+                                    Log.i("MyApp", "line: " + line.toString());
                                     line.setLength(0);
-                                }
-                                else
+                                } else
                                     line.append(toAppend);
-                                if(tout.ready() == false) {
-                                    Log.i("MyApp","Shit broke");
+                                if (tout.ready() == false) {
+                                    //Log.i("MyApp", "Shit broke");
                                 }
                             }
+                            if (i >= 5) {
+                                return;
+                            }
+                            i++;
+
                         } catch (Exception e) {
                             Log.e("MyApp","************errorrrrrrr reading character**********");
                         }
-                        //Thread.sleep(1000);
+                        Thread.sleep(500);
                     }
                 }catch (Exception ex) {
                     Log.i("MyApp",ex.getMessage());

@@ -31,8 +31,9 @@ public class MainActivity extends AppCompatActivity {
 
     public void seeFood(View view) {
         //Log.i("MyApp","Trying to Exec");
-        server.execute();
-        //server.start();
+        //server.execute();
+        server.start();
+
         //Log.i("MyApp","Exec");
     }
 
