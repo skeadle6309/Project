@@ -30,6 +30,13 @@
             android:onClick="seeFood"
             android:text="@string/submitPhotoBtn" />
 
+        <Button
+            android:id="@+id/ToastTest"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="toastTest"
+            android:text="@string/ToastTest" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -51,6 +58,12 @@
                 android:onClick="addPhotoGal"
                 android:text="@string/addPhotoGalBtn" />
         </LinearLayout>
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:srcCompat="@mipmap/ic_launcher" />
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

@@ -3,4 +3,5 @@
     <string name="addPhotoCamBtn">Camera</string>
     <string name="addPhotoGalBtn">Gallery</string>
     <string name="submitPhotoBtn">SEE Food</string>
+    <string name="ToastTest">Toast That Shit</string>
 </resources>
