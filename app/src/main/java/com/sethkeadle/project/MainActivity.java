@@ -2,7 +2,6 @@ package com.sethkeadle.project;
 
 import android.Manifest;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -15,10 +14,7 @@ import android.widget.Toast;
 import com.esafirm.imagepicker.features.ImagePicker;
 import com.esafirm.imagepicker.model.Image;
 
-import java.io.File;
-import java.net.URL;
 import java.sql.Blob;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -28,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
     private String mCurrentPhotoPath;
     private ImageView imageView;
     private Image image;
-    private String filePath, fileName;
+    private String filePath, fileName = "cookies.png";
     private Blob blob;
 
 
@@ -46,16 +42,14 @@ public class MainActivity extends AppCompatActivity {
                         Manifest.permission.INTERNET
                 }, 101); // your request code
 
-
-        //trying shit
+        //start the server now
+        server.start();
     }
 
     public void seeFood(View view) {
-        //Log.i("MyApp","Trying to Exec");
-        //server.execute();
-        server.start(fileName);
-
-        //Log.i("MyApp","Exec");
+        //submit the photo to see if food exist
+        Toast.makeText(this, "test", Toast.LENGTH_SHORT).show();
+        server.addFile(fileName);
     }
 
     public void addPhotoCam(View view) {
@@ -74,12 +68,11 @@ public class MainActivity extends AppCompatActivity {
 //                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 //        startActivityForResult(pickPhoto , 1);
         //Log.i("MyApp",file.toString());
-        Toast.makeText(this, "test", Toast.LENGTH_SHORT).show();
-        server.addFile("cookies.png");
+
     }
 
     public void toastTest(View view) {
-        String lastLine = server.getLastLine();
+        String lastLine = server.getSshPairReturn();
         Toast.makeText(this, lastLine, Toast.LENGTH_LONG).show();
     }
     @Override
