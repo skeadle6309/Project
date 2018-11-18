@@ -22,7 +22,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    private SSH_Server server;
+    private SSH_Server_Testing server;
     private SFTP_Server sftp;
     static final int REQUEST_TAKE_PHOTO = 1;
     private String mCurrentPhotoPath;
@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         //instantiate vars
-        server = SSH_Server.getInsance(this);
+        server = SSH_Server_Testing.getInsance(this).getInsance(this);
         sftp = SFTP_Server.getInsance(this);
         //get permissions
         ActivityCompat.requestPermissions(this,
@@ -74,7 +74,8 @@ public class MainActivity extends AppCompatActivity {
 //                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 //        startActivityForResult(pickPhoto , 1);
         //Log.i("MyApp",file.toString());
-        Toast.makeText(this, image.getName(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "test", Toast.LENGTH_SHORT).show();
+        server.addFile("cookies.png");
     }
 
     public void toastTest(View view) {
