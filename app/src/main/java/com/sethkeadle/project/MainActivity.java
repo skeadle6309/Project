@@ -2,10 +2,15 @@ package com.sethkeadle.project;
 
 import android.Manifest;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.util.Pair;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -20,11 +25,13 @@ public class MainActivity extends AppCompatActivity {
 
     private SSH_Server_Testing server;
     private SFTP_Server sftp;
+
     static final int REQUEST_TAKE_PHOTO = 1;
     private String mCurrentPhotoPath;
     private ImageView imageView;
     private Image image;
     private String filePath, fileName = "cookies.png";
+
     private Blob blob;
 
 
@@ -34,8 +41,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         //instantiate vars
-        server = SSH_Server_Testing.getInsance(this).getInsance(this);
+        imageView = (ImageView)findViewById(R.id.imageView);
+        server = SSH_Server_Testing.getInsance(this);
         sftp = SFTP_Server.getInsance(this);
+
         //get permissions
         ActivityCompat.requestPermissions(this,
                 new String[] {
@@ -48,32 +57,17 @@ public class MainActivity extends AppCompatActivity {
 
     public void seeFood(View view) {
         //submit the photo to see if food exist
-        Toast.makeText(this, "test", Toast.LENGTH_SHORT).show();
+
+        //change this to filename when the database is working properly
         server.addFile(fileName);
-    }
-
-    public void addPhotoCam(View view) {
-        //Toast.makeText(this, "camera", Toast.LENGTH_SHORT).show();
-
-//        Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//        startActivityForResult(takePicture, 0);
-
-        ImagePicker.create(this).start();
-
-    }
-
-    public void addPhotoGal(View view) {
-        //Toast.makeText(this, "galery", Toast.LENGTH_SHORT).show();
-//        Intent pickPhoto = new Intent(Intent.ACTION_PICK,
-//                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-//        startActivityForResult(pickPhoto , 1);
-        //Log.i("MyApp",file.toString());
-
+        String lastLine = server.getSshPairReturn();
+        Toast.makeText(this, lastLine, Toast.LENGTH_LONG).show();
     }
 
     public void toastTest(View view) {
-        String lastLine = server.getSshPairReturn();
-        Toast.makeText(this, lastLine, Toast.LENGTH_LONG).show();
+
+
+        //Toast.makeText(this, filePath, Toast.LENGTH_SHORT).show();
     }
     @Override
     protected void onActivityResult(int requestCode, final int resultCode, Intent data) {
@@ -81,13 +75,22 @@ public class MainActivity extends AppCompatActivity {
             // get a single image only
             image = ImagePicker.getFirstImageOrNull(data);
             Toast.makeText(this, image.getPath(), Toast.LENGTH_LONG).show();
-            filePath = image.getPath();
-            fileName = image.getName();
+            filePath = image.getPath().trim();
+            fileName = image.getName().trim();
             Log.i("MyApp",filePath);
             Log.i("MyApp","start sftp");
+
+
             sftp.start(filePath);
             Log.i("MyApp","sftp completed");
+
+            //display image
+            imageView.setImageURI(Uri.parse(filePath));
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    public void getPhoto(View view) {
+        ImagePicker.create(this).start();
     }
 }

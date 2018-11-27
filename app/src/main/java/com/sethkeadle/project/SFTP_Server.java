@@ -13,7 +13,7 @@ public class SFTP_Server implements Runnable {
     private JSch jsch;
     private Session session;
     private ChannelSftp myChannel;
-    private String fileName,fileDestination = "images/";
+    private String fileName,fileDestination = "/home/guest/images";
 
 
     private static SFTP_Server instance = null;
@@ -37,7 +37,8 @@ public class SFTP_Server implements Runnable {
         try {
             thread.join();
             Log.i("MyApp","Thread Joined");
-        } catch (InterruptedException e) {
+        }
+        catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -61,23 +62,9 @@ public class SFTP_Server implements Runnable {
             //send the put command
             Log.i("MyApp", fileName + ": " + fileDestination);
             myChannel.put(fileName,fileDestination);
-
         }
         catch (Exception e) {
             Log.e("MyApp", e.getMessage());
-        }
-    }
-
-    private void sendCommand(String img)
-    {
-        if(session != null && session.isConnected())
-        {
-            try {
-                OutputStream outStream = myChannel.getOutputStream();
-                Log.i("MyApp","Command: put /documents/image:277");
-            } catch(Exception e){
-                Log.e("MyApp",e.getMessage());
-            }
         }
     }
 }
