@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.Pair;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -29,7 +30,9 @@ public class MainActivity extends AppCompatActivity {
     private ImageView imageView;
     private Image image;
     private String filePath, fileName = "cookies.png";
+    private int currentImg, dbSize;
     private final String phoneFileLocation = "/sdcard/images/";
+    private Button nextBtn, prevBtn, seeFoodBtn;
 
 
     @Override
@@ -42,6 +45,11 @@ public class MainActivity extends AppCompatActivity {
 
         //instantiate vars
         imageView = (ImageView)findViewById(R.id.imageView);
+        nextBtn = (Button)findViewById(R.id.nextBtn);
+        prevBtn = (Button)findViewById(R.id.prevBtn);
+        seeFoodBtn = (Button)findViewById(R.id.seeFoodBtn);
+        nextBtn.setVisibility(View.INVISIBLE);
+        prevBtn.setVisibility(View.INVISIBLE);
         controller = new Controller(this);
 
         //get permissions
@@ -54,18 +62,33 @@ public class MainActivity extends AppCompatActivity {
     public void seeFood(View view) {
         //submit the photo to see if food exist
         controller.seeFood(fileName);
-
+        Log.i("Finished", "return: " + controller.getreturn());
     }
 
     public void toastTest(View view) {
         //Toast.makeText(this, controller.getreturn(), Toast.LENGTH_LONG).show();
         //Toast.makeText(this, filePath, Toast.LENGTH_SHORT).show();
-        controller.getDbImageReturn(1);
+//        controller.getDbImageReturn(1);
 //        Integer tmp = controller.getDbSize();
 //        Log.i("MyAppMain", tmp.toString());
 //        controller.getDbImage(1);
-//        controller.sftpGetImage("testImg.jpg");
-//        imageView.setImageURI(Uri.parse(phoneFileLocation+ "testImg.jpg"));
+        currentImg = 1;
+        dbSize = controller.getDbSize();
+        if (dbSize >= 1)
+        {
+            updateImg();
+        }
+    }
+    private void updateImg() {
+        String tmpImg = controller.getDbImageReturn(currentImg);
+        Log.i("MyAppMain","getDbImgReturn(): "+tmpImg);
+        controller.sftpGetImage(tmpImg);
+        while (controller.isSFTP_Running()){}
+        seeFoodBtn.setVisibility(View.INVISIBLE);
+        nextBtn.setVisibility(View.VISIBLE);
+        prevBtn.setVisibility(View.VISIBLE);
+        imageView.setImageURI(Uri.parse(phoneFileLocation + tmpImg));
+        Log.i("Finished", "return: " + controller.getDbResultsReturn());
     }
     @Override
     protected void onActivityResult(int requestCode, final int resultCode, Intent data) {
@@ -80,7 +103,10 @@ public class MainActivity extends AppCompatActivity {
 //            sftp.start(filePath);
 
 
-            //display image
+            //display image and update btn's
+            seeFoodBtn.setVisibility(View.VISIBLE);
+            nextBtn.setVisibility(View.INVISIBLE);
+            prevBtn.setVisibility(View.INVISIBLE);
             imageView.setImageURI(Uri.parse(filePath));
         }
         super.onActivityResult(requestCode, resultCode, data);
@@ -88,5 +114,25 @@ public class MainActivity extends AppCompatActivity {
 
     public void getPhoto(View view) {
         ImagePicker.create(this).start();
+    }
+
+    public void nextPressed(View view) {
+        if (currentImg < dbSize) {
+            currentImg = currentImg+1;
+            updateImg();
+        }
+        else {
+            Toast.makeText(this, "Last Image in the database", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void prevPressed(View view) {
+        if (currentImg > 1) {
+            currentImg = currentImg -1;
+            updateImg();
+        }
+        else {
+            Toast.makeText(this, "First Image in the database", Toast.LENGTH_SHORT).show();
+        }
     }
 }

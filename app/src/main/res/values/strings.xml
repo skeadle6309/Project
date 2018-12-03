@@ -3,4 +3,6 @@
     <string name="getPhotoBtn">Get Photo</string>
     <string name="submitPhotoBtn">SEE Food</string>
     <string name="ToastTest">Toast That</string>
+    <string name="Next">Next</string>
+    <string name="Prev">Previous</string>
 </resources>

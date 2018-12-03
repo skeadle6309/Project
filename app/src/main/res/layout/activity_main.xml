@@ -45,11 +45,36 @@
             android:onClick="getPhoto"
             android:text="@string/getPhotoBtn" />
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/prevBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="prevPressed"
+                android:text="@string/Prev" />
+
+            <Button
+                android:id="@+id/nextBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="nextPressed"
+                android:text="@string/Next" />
+        </LinearLayout>
+
         <ImageView
             android:id="@+id/imageView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:srcCompat="@mipmap/ic_launcher" />
+            app:srcCompat="@mipmap/ic_launcher"
+            tools:layout_editor_absoluteX="7dp"
+            tools:layout_editor_absoluteY="504dp" />
+
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

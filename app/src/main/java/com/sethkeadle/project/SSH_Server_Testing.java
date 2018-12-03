@@ -28,8 +28,8 @@ public class SSH_Server_Testing implements Runnable {
     private Stack<String> fileNames;
     private Context context;
     private SSH_Server_DataBase database;
-    private Controller controller;
     private Boolean readyForImage = false;
+    private Boolean readyForResults = false;
     final private String REGEX_PAIR = "^\\[\\[.*\\]\\]$";
     final private String REGEX_BEGIN_INPUT = "^0000.*";
 
@@ -150,6 +150,7 @@ public class SSH_Server_Testing implements Runnable {
                                         Log.i("MyApp", "Found Pair" + line.toString().trim());
                                         sshPairReturn = line.toString().trim();
                                         trimSSHReturn();
+                                        readyForResults = true;
                                         //database = SSH_Server_DataBase.getInsance(context);
 
                                         //send the database the last line results(string comparison) and the filename
@@ -183,10 +184,12 @@ public class SSH_Server_Testing implements Runnable {
 
     private void seeFood(String imgName) {
         toChannel.println(imgName);
-        Log.i("MyApp", "seefood");
+//        Log.i("MyApp", "seefood");
+
+
     }
 
-    public void addFile(String fileName) {
+    public String addFile(String fileName) {
         while (!readyForImage)
         {
             Log.i("MyApp","Waiting on TensorFlow");
@@ -197,8 +200,14 @@ public class SSH_Server_Testing implements Runnable {
                 e.printStackTrace();
             }
         }
-
         fileNames.push(fileName);
+        Log.i("MyAppServer", "Waiting on results");
+        while (!readyForResults){}
+        Log.i("MyAppServer", "Results found");
+        readyForResults = false;
+        Log.i("MyAppServer", sshPairReturn);
+
+        return sshPairReturn;
     }
 
     private boolean regExVerify(String line, String regex) {

@@ -31,6 +31,7 @@ public class SFTP_Server implements Runnable {
     private String fileName;
     private OutputStream outStream;
     private OutputStreamWriter outputStreamWriter;
+    private Boolean SFTP_Running =false;
     private final String fileDestination = "/home/guest/images";
     private final String localFileDestination = "/home/guest/images";
     private Stack<Pair<Integer,String>> commandList;
@@ -55,6 +56,7 @@ public class SFTP_Server implements Runnable {
     }
 
     public void pushCommand(Pair<Integer,String>cmd) {
+        SFTP_Running = true;
         commandList.push(cmd);
         Log.i("MyAppSftp","Cmd pushed " + cmd.first + " and " + cmd.second);
 
@@ -122,6 +124,7 @@ public class SFTP_Server implements Runnable {
                                 }
                                 out.close();
                                 Log.i("MyAppSftp","Out stream finished");
+                                SFTP_Running = false;
                             }
                         }
                     }
@@ -136,5 +139,8 @@ public class SFTP_Server implements Runnable {
         }
     }
 
+    public Boolean getSFTP_Running(){
+        return SFTP_Running;
+    }
 
 }
