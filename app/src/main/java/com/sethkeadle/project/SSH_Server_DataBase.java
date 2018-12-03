@@ -14,6 +14,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.Stack;
+import java.util.regex.Pattern;
 
 public class SSH_Server_DataBase implements Runnable {
     private JSch jsch;
@@ -23,8 +24,14 @@ public class SSH_Server_DataBase implements Runnable {
     private Channel myChannel;
     private OutputStream outStream;
     private OutputStreamWriter outputStreamWriter;
-    private String fileName,seeFoodResult;
-    private Stack<Pair<String,String>> commandList;
+    private String fileName,seeFoodResult,dbReturn,dbSize;
+    private Stack<String> commandList;
+    private Boolean waitOnResults;
+    final private String REGEX_DB_RETURN = "^1111.*";
+    final private String REGEX_DB_SIZE_RETURN = "^1112.*";
+    final private String ADD_IMAGE_STRING = "python database/db.py 2 /home/guest/images/";
+    final private String GET_IMAGE_STRING = "python database/db.py 4";
+    final private String GET_DATABASE_SIZE = "python database/db.py 3";
 
 
     private static SSH_Server_DataBase instance = null;
@@ -38,9 +45,9 @@ public class SSH_Server_DataBase implements Runnable {
 
 
     private SSH_Server_DataBase(Context context) {
-        Log.i("MyApp", "into SSH_Server");
+        Log.i("MyAppDb", "into Database");
         jsch = new JSch();
-        commandList = new Stack<Pair<String,String>>();
+        commandList = new Stack<String>();
     }
     public void start() {
         Thread thread = new Thread(instance);
@@ -55,32 +62,37 @@ public class SSH_Server_DataBase implements Runnable {
             session.setPassword("password");
             session.setConfig(config);
             session.setTimeout(10000);
-            Log.i("MyApp","try To connect");
+            Log.i("MyAppDb","Database try To connect");
             session.connect();
             myChannel = session.openChannel("shell");
             myChannel.connect();
-            Log.i("MyApp","Connected");
+            Log.i("MyAppDb","Database Connected");
             //set up send command function
             outStream = myChannel.getOutputStream();
             outputStreamWriter = new OutputStreamWriter(outStream);
             toChannel = new PrintWriter(outputStreamWriter, true);
 
-            //send a command for testing
-            sendCommand();
-            //Log.i("MyApp","Command Sent");
 
             //start reader thread
             inStream = myChannel.getInputStream();
             readerThread();
+
+
+            //send a command for testing
+            sendCommand();
+            //Log.i("MyApp","Command Sent");
+
+
+
         }
         catch (Exception e) {
-            Log.e("MyApp", e.getMessage());
+            Log.e("MyAppDb", e.getMessage());
         }
     }
     private void readerThread() {
         Thread thread = new Thread() {
             public void run() {
-                Log.i("MyApp", "Reader Thread running");
+                Log.i("MyAppDb", "Database Reader Thread running");
                 StringBuilder line = new StringBuilder();
                 char toAppend;
                 final InputStreamReader tout = new InputStreamReader(inStream);
@@ -90,24 +102,38 @@ public class SSH_Server_DataBase implements Runnable {
                             while (tout.ready()) {
                                 toAppend = (char) tout.read();
                                 if (toAppend == '\n') {
-                                        Log.i("MyApp", line.toString().trim());
+                                    if (regExVerify(line.toString().trim(),REGEX_DB_RETURN)) {
+                                        dbReturn = line.toString().trim();
+                                        dbReturn = dbReturn.replace("1111","");
+                                        waitOnResults = true;
+                                    }
+                                    else if (regExVerify(line.toString().trim(),REGEX_DB_SIZE_RETURN)) {
+                                        dbSize = line.toString().trim();
+                                        dbSize = dbSize.replace("1112 ","");
+                                        waitOnResults = true;
+                                    }
+                                    if (!line.toString().trim().isEmpty()){
+                                        Log.i("MyAppDb",line.toString().trim());
+                                    }
+
                                     line.setLength(0);
                                 } else
                                     line.append(toAppend);
                             }
+                            sleep(1000);
                         }
                         catch (Exception e) {
-                            Log.e("MyApp", "************errorrrrrrr reading character**********");
+                            Log.e("MyAppDb", "************error reading character**********");
                         }
                     }
                 }
                 catch (Exception ex) {
-                    Log.i("MyApp", ex.getMessage());
+                    Log.i("MyAppDb", ex.getMessage());
                     try {
                         tout.close();
                     }
                     catch (Exception e) {
-                        Log.e("MyApp", "error at catch");
+                        Log.e("MyAppDb", "error at catch");
                     }
                 }
             }
@@ -118,17 +144,35 @@ public class SSH_Server_DataBase implements Runnable {
     {
         while (true) {
             if (!commandList.isEmpty()) {
-                Pair<String,String> command = commandList.pop();
-                fileName = command.first;
-                seeFoodResult = command.second;
-                toChannel.println("python database/db.py 2 /home/guest/images/" + fileName + " " + seeFoodResult);
-                Log.i("MyApp", "Database Command sent: /home/guest/images/" + fileName + " " + seeFoodResult);
+                String tmp = commandList.pop();
+                toChannel.println(tmp);
+                Log.i("MyAppDb", "sendCommadn() command list pop: "+tmp);
             }
         }
     }
 
-    public void addCommand(Pair<String,String> cmd) {
-        commandList.push(cmd);
+    public void addImageCommand(Pair<String,String> cmd) {
+        String pushImage = ADD_IMAGE_STRING + cmd.first + " " + cmd .second;
+        commandList.push(pushImage);
+    }
+    public String getImageCommand(int i) {
+        commandList.push(GET_IMAGE_STRING + " " + Integer.toString(i));
+        waitOnResults = false;
+        while (!waitOnResults){}
+//        Log.i("MyAppDb",dbReturn);
+        return dbReturn;
     }
 
+    //this will return a Integer when it works 100% in test mode for now
+    public String getSize() {
+        commandList.push(GET_DATABASE_SIZE);
+        waitOnResults = false;
+        while (!waitOnResults){}
+//        Log.i("MyAppDb",dbSize);
+        return dbSize;
+    }
+    private boolean regExVerify(String line, String regex) {
+        Pattern pattern = Pattern.compile(regex);
+        return pattern.matcher(line).matches();
+    }
 }

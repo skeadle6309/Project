@@ -2,6 +2,7 @@ package com.sethkeadle.project;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -19,55 +20,52 @@ import android.widget.Toast;
 import com.esafirm.imagepicker.features.ImagePicker;
 import com.esafirm.imagepicker.model.Image;
 
+import java.net.URI;
 import java.sql.Blob;
 
 public class MainActivity extends AppCompatActivity {
+    private Controller controller;
 
-    private SSH_Server_Testing server;
-    private SFTP_Server sftp;
-
-    static final int REQUEST_TAKE_PHOTO = 1;
-    private String mCurrentPhotoPath;
     private ImageView imageView;
     private Image image;
     private String filePath, fileName = "cookies.png";
-
-    private Blob blob;
+    private final String phoneFileLocation = "/sdcard/images/";
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.activity_main);
+
+        //get permissions
 
         //instantiate vars
         imageView = (ImageView)findViewById(R.id.imageView);
-        server = SSH_Server_Testing.getInsance(this);
-        sftp = SFTP_Server.getInsance(this);
+        controller = new Controller(this);
 
         //get permissions
         ActivityCompat.requestPermissions(this,
                 new String[] {
                         Manifest.permission.INTERNET
                 }, 101); // your request code
-
-        //start the server now
-        server.start();
     }
 
     public void seeFood(View view) {
         //submit the photo to see if food exist
+        controller.seeFood(fileName);
 
-        //change this to filename when the database is working properly
-        server.addFile(fileName);
-        String lastLine = server.getSshPairReturn();
-        Toast.makeText(this, lastLine, Toast.LENGTH_LONG).show();
     }
 
     public void toastTest(View view) {
-
-
+        //Toast.makeText(this, controller.getreturn(), Toast.LENGTH_LONG).show();
         //Toast.makeText(this, filePath, Toast.LENGTH_SHORT).show();
+        controller.getDbImageReturn(1);
+//        Integer tmp = controller.getDbSize();
+//        Log.i("MyAppMain", tmp.toString());
+//        controller.getDbImage(1);
+//        controller.sftpGetImage("testImg.jpg");
+//        imageView.setImageURI(Uri.parse(phoneFileLocation+ "testImg.jpg"));
     }
     @Override
     protected void onActivityResult(int requestCode, final int resultCode, Intent data) {
@@ -77,12 +75,10 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, image.getPath(), Toast.LENGTH_LONG).show();
             filePath = image.getPath().trim();
             fileName = image.getName().trim();
-            Log.i("MyApp",filePath);
-            Log.i("MyApp","start sftp");
+            Log.i("MyApp",filePath + " controller.sftp()");
+            controller.sftpAddImage(filePath);
+//            sftp.start(filePath);
 
-
-            sftp.start(filePath);
-            Log.i("MyApp","sftp completed");
 
             //display image
             imageView.setImageURI(Uri.parse(filePath));
