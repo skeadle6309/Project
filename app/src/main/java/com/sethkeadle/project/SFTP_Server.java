@@ -104,8 +104,12 @@ public class SFTP_Server implements Runnable {
                 if (!commandList.empty()) {
                     if (commandList.peek().first == two) {
                         Pair<Integer,String> tmp = commandList.pop();
-                        Log.i("MyAppSftp","start FOS");
-                        try (FileOutputStream out = new FileOutputStream(Environment.getExternalStorageDirectory().getPath()+"/"+tmp.second,true)) {
+                        File outputFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+"/images");
+                        outputFile.mkdirs();
+                        Log.i("MyAppSftp", "Output file exist: " + String.valueOf(outputFile.exists()));
+                        Log.i("MyAppSftp","output File: " + outputFile.getAbsolutePath());
+                        Log.i("MyAppSftp","start FOS: " + Environment.getExternalStorageDirectory().getAbsolutePath()+"/"+tmp.second);
+                        try (FileOutputStream out = new FileOutputStream(Environment.getExternalStorageDirectory().getAbsolutePath()+"/"+tmp.second,true)) {
                             Log.i("MyAppSftp","start IS filename is: " + Environment.getExternalStorageDirectory().getPath() + "/" + tmp.second);
                             try (InputStream in = myChannel.get(tmp.second)) {
                                 // read from in, write to out
@@ -128,7 +132,7 @@ public class SFTP_Server implements Runnable {
             }
         }
         catch (Exception e) {
-            Log.e("MyApp", e.getMessage());
+            Log.e("MyAppSftp", e.getMessage());
         }
     }
 
