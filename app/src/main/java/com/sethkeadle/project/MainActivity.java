@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private String filePath, fileName = "cookies.png";
     private int currentImg, dbSize;
     private final String phoneFileLocation = "/sdcard/images/";
-    private Button nextBtn, prevBtn, seeFoodBtn;
+    private Button nextBtn, prevBtn, seeFoodBtn, dataBaseBtn;
 
 
     @Override
@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
         nextBtn = (Button)findViewById(R.id.nextBtn);
         prevBtn = (Button)findViewById(R.id.prevBtn);
         seeFoodBtn = (Button)findViewById(R.id.seeFoodBtn);
+        dataBaseBtn = (Button)findViewById(R.id.dataBaseBtn);
         nextBtn.setVisibility(View.INVISIBLE);
         prevBtn.setVisibility(View.INVISIBLE);
         controller = new Controller(this);
@@ -65,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
         Log.i("Finished", "return: " + controller.getreturn());
     }
 
-    public void toastTest(View view) {
+    public void dataBase(View view) {
         //Toast.makeText(this, controller.getreturn(), Toast.LENGTH_LONG).show();
         //Toast.makeText(this, filePath, Toast.LENGTH_SHORT).show();
 //        controller.getDbImageReturn(1);
@@ -84,9 +85,7 @@ public class MainActivity extends AppCompatActivity {
         Log.i("MyAppMain","getDbImgReturn(): "+tmpImg);
         controller.sftpGetImage(tmpImg);
         while (controller.isSFTP_Running()){}
-        seeFoodBtn.setVisibility(View.INVISIBLE);
-        nextBtn.setVisibility(View.VISIBLE);
-        prevBtn.setVisibility(View.VISIBLE);
+        setDataBaseViews();
         imageView.setImageURI(Uri.parse(phoneFileLocation + tmpImg));
         Log.i("Finished", "return: " + controller.getDbResultsReturn());
     }
@@ -104,9 +103,7 @@ public class MainActivity extends AppCompatActivity {
 
 
             //display image and update btn's
-            seeFoodBtn.setVisibility(View.VISIBLE);
-            nextBtn.setVisibility(View.INVISIBLE);
-            prevBtn.setVisibility(View.INVISIBLE);
+            setSeefoodViews();
             imageView.setImageURI(Uri.parse(filePath));
         }
         super.onActivityResult(requestCode, resultCode, data);
@@ -135,4 +132,19 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "First Image in the database", Toast.LENGTH_SHORT).show();
         }
     }
+
+    public void setDataBaseViews(){
+        seeFoodBtn.setVisibility(View.GONE);
+        dataBaseBtn.setVisibility(View.GONE);
+        nextBtn.setVisibility(View.VISIBLE);
+        prevBtn.setVisibility(View.VISIBLE);
+    }
+
+    public void setSeefoodViews() {
+        seeFoodBtn.setVisibility(View.VISIBLE);
+        dataBaseBtn.setVisibility(View.VISIBLE);
+        nextBtn.setVisibility(View.INVISIBLE);
+        prevBtn.setVisibility(View.INVISIBLE);
+    }
+
 }

@@ -32,10 +32,10 @@
             android:text="@string/submitPhotoBtn" />
 
         <Button
-            android:id="@+id/ToastTest"
+            android:id="@+id/dataBaseBtn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="toastTest"
+            android:onClick="dataBase"
             android:text="@string/ToastTest" />
 
         <Button
