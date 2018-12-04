@@ -44,9 +44,7 @@ public class MainActivity extends AppCompatActivity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.activity_main);
 
-        //get permissions
-
-        //instantiate vars
+        //instantiate variables
         imageView = (ImageView)findViewById(R.id.imageView);
         nextBtn = (Button)findViewById(R.id.nextBtn);
         prevBtn = (Button)findViewById(R.id.prevBtn);
@@ -64,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
                 }, 101); // your request code
     }
 
+    //take the current image selected from the gallery and submit it to AWS to get seefood reults
     public void seeFood(View view) {
         //submit the photo to see if food exist
         controller.seeFood(fileName);
@@ -72,13 +71,10 @@ public class MainActivity extends AppCompatActivity {
         Log.i("Finished", "return: " + controller.getreturn());
     }
 
+
+    //keeps the current image index and compares it to the database size
+    //if the current image index size is smaller than the database size update the current image.
     public void dataBase(View view) {
-        //Toast.makeText(this, controller.getreturn(), Toast.LENGTH_LONG).show();
-        //Toast.makeText(this, filePath, Toast.LENGTH_SHORT).show();
-//        controller.getDbImageReturn(1);
-//        Integer tmp = controller.getDbSize();
-//        Log.i("MyAppMain", tmp.toString());
-//        controller.getDbImage(1);
         currentImg = 1;
         dbSize = controller.getDbSize();
         if (dbSize >= 1)
@@ -86,6 +82,10 @@ public class MainActivity extends AppCompatActivity {
             updateImg();
         }
     }
+
+    //take the current image index and submit it to the controller to fetch that index in the database
+    //where the database returns the full path to the image and the seefood results in string format
+    //the controller also updates the guage to provider user with visual representation of food
     private void updateImg() {
         String tmpImg = controller.getDbImageReturn(currentImg);
         Log.i("MyAppMain","getDbImgReturn(): "+tmpImg);
@@ -97,6 +97,9 @@ public class MainActivity extends AppCompatActivity {
         gauge.setValue((int) Math.round(controller.getPercentDb()));
         Log.i("Finished", "return: " + controller.getDbResultsReturn());
     }
+
+    //override function for the image picker. sets the image view to the selected picture and saves
+    //the image file name and the path to the image.
     @Override
     protected void onActivityResult(int requestCode, final int resultCode, Intent data) {
         if (ImagePicker.shouldHandle(requestCode, resultCode, data)) {
@@ -107,20 +110,18 @@ public class MainActivity extends AppCompatActivity {
             fileName = image.getName().trim();
             Log.i("MyApp",filePath + " controller.sftp()");
             controller.sftpAddImage(filePath);
-//            sftp.start(filePath);
-
-
-            //display image and update btn's
             setSeefoodViews();
             imageView.setImageURI(Uri.parse(filePath));
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+    //starts the image picker
     public void getPhoto(View view) {
         ImagePicker.create(this).start();
     }
 
+    //increments the current image index and verifies it is within the database index, then updates
     public void nextPressed(View view) {
         if (currentImg < dbSize) {
             currentImg = currentImg+1;
@@ -131,6 +132,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    //increments the current image index and verifies it is within the database index, then updates
     public void prevPressed(View view) {
         if (currentImg > 1) {
             currentImg = currentImg -1;
@@ -141,6 +143,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    //update the views easy functions.....
     public void setDataBaseViews(){
         seeFoodBtn.setVisibility(View.GONE);
         dataBaseBtn.setVisibility(View.GONE);

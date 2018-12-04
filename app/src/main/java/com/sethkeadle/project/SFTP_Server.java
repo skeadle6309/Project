@@ -95,22 +95,6 @@ public class SFTP_Server implements Runnable {
                 if (!commandList.empty()) {
                     if (commandList.peek().first == two) {
                         Pair<Integer,String> tmp = commandList.pop();
-//                        myChannel.lcd("/sdcard/Download");
-                        //Log.i("MyAppSftp", "lpwd() " + myChannel.lpwd());
-                        //Log.i("MyAppSftp", "get() "+ tmp.second);
-
-                        //write with file out
-//                        Log.i("MyAppSftp","get Dir");
-//                        File path = context.getExternalFilesDir(null);
-//                        Log.i("MyAppSftp","Create Dir");
-//                        File dir = new File(Environment.getExternalStorageDirectory(),"ImagesFromDb");
-//                        if (!dir.exists()) {
-//                            dir.mkdirs();
-//                        }
-//                        Log.i("MyAppSftp","Create Output");
-//                        File output = new File(Environment.getExternalStorageDirectory(), tmp.second);
-//                        Log.i("MyAppSftp","Create Output New");
-//                        output.createNewFile();
                         Log.i("MyAppSftp","start FOS");
                         try (FileOutputStream out = new FileOutputStream(Environment.getExternalStorageDirectory().getPath()+"/"+tmp.second,true)) {
                             Log.i("MyAppSftp","start IS filename is: " + Environment.getExternalStorageDirectory().getPath() + "/" + tmp.second);
