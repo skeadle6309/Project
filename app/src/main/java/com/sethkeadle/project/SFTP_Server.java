@@ -82,7 +82,7 @@ public class SFTP_Server implements Runnable {
 
     //Main command line for running SFTP_Server.java class
     //Contains all logic and username/password credentials for logging
-    //into AWS via the "guest" account
+    //into AWS via the "guest" account.
     @Override
     public void run() {
         try {
