@@ -1,6 +1,7 @@
 #   CEG 4110 Fall 2018 Project
 ##   Seth Keadle Alex Voultos Daniel Howard
-/Screenshot_1543943534.png
+![alt text](https://github.com/skeadle6309/Project/blob/master/Screenshot_1543943534.png)
+
 This project is developed for the android os and has a minSDK of 16 and a target sdk of 26. This allows users from Kit-Kat and newer to run and compile this application. The application was developed in the Android Studio SDK.
 
 ##   Overview
