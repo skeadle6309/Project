@@ -66,14 +66,52 @@
                 android:onClick="nextPressed"
                 android:text="@string/Next" />
         </LinearLayout>
+        <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true" >
 
-        <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:srcCompat="@mipmap/ic_launcher"
-            tools:layout_editor_absoluteX="7dp"
-            tools:layout_editor_absoluteY="504dp" />
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:layout_gravity="center"
+                app:srcCompat="@mipmap/ic_launcher" />
+
+            <pl.pawelkleczkowski.customgauge.CustomGauge
+                android:id="@+id/gauge"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:layout_alignParentBottom="true"
+                android:layout_gravity="center_horizontal|bottom"
+
+                android:layout_marginBottom="-80dp"
+                android:paddingBottom="10dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingTop="30dp"
+                app:gaugeEndValue="100"
+                app:gaugePointEndColor="@color/md_green_500"
+                app:gaugePointStartColor="@color/md_red_500"
+                app:gaugeStartAngle="180"
+                app:gaugeStartValue="0"
+                app:gaugeStrokeCap="BUTT"
+                app:gaugeStrokeColor="@color/md_grey_400"
+                app:gaugeStrokeWidth="20dp"
+                app:gaugeSweepAngle="180"
+                app:gaugeDividerSize="1"
+                app:gaugeDividerColor="@color/md_yellow_500"
+                app:gaugeDividerStep="10"
+                app:gaugeDividerDrawFirst="false"
+                app:gaugeDividerDrawLast="true"
+                />
+        </FrameLayout>
+
+
 
     </LinearLayout>
 

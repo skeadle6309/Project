@@ -8,7 +8,7 @@ import java.util.Stack;
 
 public class Controller {
     private Context context;
-    private SSH_Server_Testing server;
+    private SSH_Server_Tensorflow server;
     private SFTP_Server sftp;
     private SSH_Server_DataBase dataBase;
     private Stack<String> databaseCommandList;
@@ -21,7 +21,7 @@ public class Controller {
 
     public Controller(Context context) {
         this.context = context;
-        server = SSH_Server_Testing.getInsance(context);
+        server = SSH_Server_Tensorflow.getInsance(context);
         sftp = SFTP_Server.getInsance(context);
         dataBase = SSH_Server_DataBase.getInsance(context);
         //start the servers now
@@ -57,7 +57,7 @@ public class Controller {
         dbImg = dbImg.replace(i+" /home/guest/images/","").trim();
         Log.i("MyAppCtrl",dbImg);
         seperateFileReturn(dbImg);
-        Log.i("MyAppCtrl","fileName: "+fileNameReturned + " Results: " + fileResultsReturned);
+        Log.i("MyAppCtrlThis","fileName: "+fileNameReturned + " Results: " + fileResultsReturned);
         return fileNameReturned;
     }
     public void addDbImage(Pair<String,String> cmd) {
@@ -78,5 +78,35 @@ public class Controller {
     }
     public String getDbResultsReturn(){
         return fileResultsReturned;
+    }
+    public Double getPercentSeeFood(){
+        return getPercent(getreturn());
+    }
+    public Double getPercentDb() {
+        return getPercent(fileResultsReturned);
+    }
+    private Double getPercent(String totalScore) {
+        String[] scores = totalScore.split("\\s+");
+
+        //Convert the Strings into doubles
+        double score_1 = Double.parseDouble(scores[0]);
+        double score_2 = Double.parseDouble(scores[1]);
+
+        double finalScore2 = score_1 - Math.abs(score_2);
+
+        //Put the score on a 0 to -10 scale
+        double test = (finalScore2) + 5;
+
+        //Convert the scale to 0 to 10 and find a percentage
+        double finalScore = test * 10;
+
+        if (finalScore > 100){
+            finalScore = 100.0;
+        } else if (finalScore < 0){
+            finalScore = 0.0;
+        }
+
+        //Return final percentage
+        return finalScore;
     }
 }

@@ -24,6 +24,8 @@ import com.esafirm.imagepicker.model.Image;
 import java.net.URI;
 import java.sql.Blob;
 
+import pl.pawelkleczkowski.customgauge.CustomGauge;
+
 public class MainActivity extends AppCompatActivity {
     private Controller controller;
 
@@ -33,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
     private int currentImg, dbSize;
     private final String phoneFileLocation = "/sdcard/images/";
     private Button nextBtn, prevBtn, seeFoodBtn, dataBaseBtn;
+    private CustomGauge gauge;
 
 
     @Override
@@ -49,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
         prevBtn = (Button)findViewById(R.id.prevBtn);
         seeFoodBtn = (Button)findViewById(R.id.seeFoodBtn);
         dataBaseBtn = (Button)findViewById(R.id.dataBaseBtn);
+        gauge = findViewById(R.id.gauge);
         nextBtn.setVisibility(View.INVISIBLE);
         prevBtn.setVisibility(View.INVISIBLE);
         controller = new Controller(this);
@@ -63,6 +67,8 @@ public class MainActivity extends AppCompatActivity {
     public void seeFood(View view) {
         //submit the photo to see if food exist
         controller.seeFood(fileName);
+        gauge.setVisibility(View.VISIBLE);
+        gauge.setValue((int) Math.round(controller.getPercentSeeFood()));
         Log.i("Finished", "return: " + controller.getreturn());
     }
 
@@ -87,6 +93,8 @@ public class MainActivity extends AppCompatActivity {
         while (controller.isSFTP_Running()){}
         setDataBaseViews();
         imageView.setImageURI(Uri.parse(phoneFileLocation + tmpImg));
+//        Toast.makeText(this, controller.getPercentDb().toString() , Toast.LENGTH_LONG).show();
+        gauge.setValue((int) Math.round(controller.getPercentDb()));
         Log.i("Finished", "return: " + controller.getDbResultsReturn());
     }
     @Override
@@ -94,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
         if (ImagePicker.shouldHandle(requestCode, resultCode, data)) {
             // get a single image only
             image = ImagePicker.getFirstImageOrNull(data);
-            Toast.makeText(this, image.getPath(), Toast.LENGTH_LONG).show();
+//            Toast.makeText(this, image.getPath(), Toast.LENGTH_LONG).show();
             filePath = image.getPath().trim();
             fileName = image.getName().trim();
             Log.i("MyApp",filePath + " controller.sftp()");
@@ -145,6 +153,8 @@ public class MainActivity extends AppCompatActivity {
         dataBaseBtn.setVisibility(View.VISIBLE);
         nextBtn.setVisibility(View.INVISIBLE);
         prevBtn.setVisibility(View.INVISIBLE);
+        gauge.setVisibility(View.INVISIBLE);
     }
+
 
 }
