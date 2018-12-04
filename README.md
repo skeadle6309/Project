@@ -15,3 +15,7 @@ The user is first presented with three buttons "seefood", "View the Database", a
 A simple gradle dependency add
 #### pkleczko/CustomGauge
 add the gradle dependency along with adding the custom gauge xml layout to the activities.xml layout.
+![alt text]https://github.com/skeadle6309/Project/blob/master/Screenshot_1543943558.png
+![alt text]https://github.com/skeadle6309/Project/blob/master/Screenshot_1543943568.png
+![alt text]https://github.com/skeadle6309/Project/blob/master/Screenshot_1543943588.png
+![alt text]https://github.com/skeadle6309/Project/blob/master/Screenshot_1543943664.png
