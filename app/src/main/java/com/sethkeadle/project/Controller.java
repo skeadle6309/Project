@@ -40,9 +40,7 @@ public class Controller {
         Log.i("MyAppCtrl","waiting on seeFoodResults");
         while (seeFoodReturn == null){}
         Log.i("MyAppCtrl","Found seeFoodResults");
-        String tmp = seeFoodReturn;
-        seeFoodReturn = null;
-        return tmp;
+        return seeFoodReturn;
     }
 
     //add a new image via sftp

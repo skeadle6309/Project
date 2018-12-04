@@ -66,8 +66,8 @@ public class MainActivity extends AppCompatActivity {
     public void seeFood(View view) {
         //submit the photo to see if food exist
         controller.seeFood(fileName);
-        gauge.setVisibility(View.VISIBLE);
         gauge.setValue((int) Math.round(controller.getPercentSeeFood()));
+        gauge.setVisibility(View.VISIBLE);
         Log.i("Finished", "return: " + controller.getreturn());
     }
 
