@@ -41,6 +41,7 @@ public class SFTP_Server implements Runnable {
 
     private static SFTP_Server instance = null;
 
+    //Create SFTP_Server class for use with threads
     public static SFTP_Server getInsance(Context context) {
         if (instance == null) {
             instance = new SFTP_Server(context);
@@ -48,6 +49,8 @@ public class SFTP_Server implements Runnable {
         return instance;
     }
 
+    //Load the initial SFTP server connection and load
+    //the jsch library for communication with AWS
     private SFTP_Server(Context context) {
         Log.i("MyApp", "into SFTP");
         jsch = new JSch();
@@ -55,12 +58,15 @@ public class SFTP_Server implements Runnable {
         this.context = context;
     }
 
+    //Push commands via SSH into AWS
     public void pushCommand(Pair<Integer,String>cmd) {
         SFTP_Running = true;
         commandList.push(cmd);
         Log.i("MyAppSftp","Cmd pushed " + cmd.first + " and " + cmd.second);
-
     }
+
+    //Starts thread for passing commands into AWS, the image file will be passed
+    //and be stored locally on AWS server
     public void start() {
 //        this.fileName = fileName;
         Thread thread = new Thread(instance);
@@ -74,6 +80,9 @@ public class SFTP_Server implements Runnable {
         }
     }
 
+    //Main command line for running SFTP_Server.java class
+    //Contains all logic and username/password credentials for logging
+    //into AWS via the "guest" account
     @Override
     public void run() {
         try {

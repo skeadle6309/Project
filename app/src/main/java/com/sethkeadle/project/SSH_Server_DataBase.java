@@ -36,6 +36,7 @@ public class SSH_Server_DataBase implements Runnable {
 
     private static SSH_Server_DataBase instance = null;
 
+    //Create SSH_Server_DataBase class for use with threads
     public static SSH_Server_DataBase getInsance(Context context) {
         if (instance == null) {
             instance = new SSH_Server_DataBase(context);
@@ -43,16 +44,23 @@ public class SSH_Server_DataBase implements Runnable {
         return instance;
     }
 
-
+    //Creates a command list variable and loads jsch library
+    //for communication with AWS
     private SSH_Server_DataBase(Context context) {
         Log.i("MyAppDb", "into Database");
         jsch = new JSch();
         commandList = new Stack<String>();
     }
+
+    //Initialize the SSH_Server_Database.java class
     public void start() {
         Thread thread = new Thread(instance);
         thread.start();
     }
+
+    //Main command line for running SSH_Server_DataBase.java class
+    //Contains all logic and username/password credentials for logging
+    //into AWS via the "guest" account
     @Override
     public void run() {
         try {
@@ -89,6 +97,10 @@ public class SSH_Server_DataBase implements Runnable {
             Log.e("MyAppDb", e.getMessage());
         }
     }
+
+    //readerThread is a class that reads the console from the AWS instance
+    //All information such as filePaths and seefood scores are passed via the
+    //console in readerThread and put into their respective local variables
     private void readerThread() {
         Thread thread = new Thread() {
             public void run() {
@@ -140,6 +152,8 @@ public class SSH_Server_DataBase implements Runnable {
         };
         thread.start();
     }
+
+    //Sends commands to AWS via the guest account
     private void sendCommand()
     {
         while (true) {
@@ -151,10 +165,13 @@ public class SSH_Server_DataBase implements Runnable {
         }
     }
 
+    //Add image to the database in AWS (Sqlite3 python database)
     public void addImageCommand(Pair<String,String> cmd) {
         String pushImage = ADD_IMAGE_STRING + cmd.first + " " + cmd .second;
         commandList.push(pushImage);
     }
+
+    //Gets images that are returned from the AWS database
     public String getImageCommand(int i) {
         commandList.push(GET_IMAGE_STRING + " " + Integer.toString(i));
         waitOnResults = false;
@@ -171,6 +188,7 @@ public class SSH_Server_DataBase implements Runnable {
 //        Log.i("MyAppDb",dbSize);
         return dbSize;
     }
+
     private boolean regExVerify(String line, String regex) {
         Pattern pattern = Pattern.compile(regex);
         return pattern.matcher(line).matches();
